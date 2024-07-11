@@ -1,0 +1,56 @@
+#root {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.chakra-card.info {
+  position: absolute;
+  right: 1vmin;
+  bottom: 1vmin;
+  padding: 5px;
+  width: 60vw;
+  min-width: 350px;
+  display: flex;
+  flex-direction: row;
+  transition: transform 200ms ease;
+}
+
+.chakra-card.info .chakra-button {
+  transition: transform 200ms ease;
+}
+
+.chakra-card.info.minimized {
+  transform: translate(calc(100% - 34px), calc(100% - 34px));
+}
+
+.chakra-card.info.minimized .chakra-button {
+  transform: rotate(180deg);
+}
+
+.chakra-card.info svg {
+  fill: var(--chakra-colors-chakra-body-text);
+}
+
+.chakra-card.info p {
+  padding: 1vmin;
+  margin: 0;
+}
+
+.chakra-card.info p a {
+  color: dodgerblue;
+}
+
+.chakra-card.info p a:hover {
+  text-decoration: none;
+}
