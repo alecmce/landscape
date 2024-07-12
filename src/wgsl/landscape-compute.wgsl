@@ -2,15 +2,11 @@ override workgroupThreadsX = 8;
 override workgroupThreadsY = 1;
 override workgroupThreadsZ = 8;
 
+// size 12 floats, 48 bytes
 // https://webgpufundamentals.org/webgpu/lessons/resources/wgsl-offset-computer.html#x=5d00000100d100000000000000003d888b0237284d3025f2381bcb288ae878c60ccc524b94961b05d1ea8834541f68656bbfcd10bea873816749c6ff72cf4d0422bcf3f333c54aa59a48e190f9b5a39ebc969e529b65ad41153646e32583df8dc36d3238a9a2b7a6c5c1e6ed4a00308610545d4734a44ebdd8ab1358e041ec6faa51931ad7962cd95ac371a13d63ceb0bdc36bdb4d64abc924b95d906eecffd2623000
 struct Uniforms {
   layers: vec3<f32>,
   terrain: Terrain,
-}
-
-struct Terrain {
-  offset: vec3<f32>, // pad 1 byte,
-  scale:  vec3<f32>, // pad 1 byte,
 }
 
 @binding(0) @group(0) var<uniform>             uniforms: Uniforms;
@@ -110,9 +106,8 @@ fn get_marching_square_data(grid_indices: vec3<u32>, instance_index: u32) -> Mar
 }
 
 fn get_height(xz: vec2<u32>) -> f32 {
-  let x = uniforms.terrain.scale.x * (((f32(xz[0]) - uniforms.terrain.offset.x) / uniforms.layers[0]) - 0.5);
-  let z = uniforms.terrain.scale.z * (((f32(xz[1]) - uniforms.terrain.offset.z) / uniforms.layers[2]) - 0.5);
-  return (get_terrain(vec2<f32>(x, z)) * uniforms.terrain.scale.y) + uniforms.terrain.offset.y;
+  let world_xz = get_world_xz(xz, uniforms.terrain, uniforms.layers);
+  return get_world_y(get_terrain(world_xz), uniforms.terrain, uniforms.layers);
 }
 
 /** Returns a marching-square type, based on the four corners. */

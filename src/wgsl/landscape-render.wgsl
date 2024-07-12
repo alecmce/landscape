@@ -3,8 +3,8 @@ const FACE_TOP         = 2u;
 const FACE_BOTTOM_SIDE = 3u;
 const FACE_TOP_SIDE    = 4u;
 
-// https://webgpufundamentals.org/webgpu/lessons/resources/wgsl-offset-computer.html#x=5d000001005e01000000000000003d888b0237284d3025f2381bcb288ae878c60ccc524b94961b05d1ea86e70104488471fc4190e456f5a619d7f730c8c07da69c196379dfb7e9f59f3c84bc6848ab7f55e643a8fdcbc28c53ae476f6547c2f672f7dbedc37db771e1a95035fa7fe4f3f926448dc81096d5c839d53e3beb8a574e71f43ec8f53548b0dd3736ad319622a6f1b8eeda63d1b3408030710a120ef48e8aba7c6d0c51e2e0f7eeba07797d9b9b33db7f3459e8d65573f5c5d688951bff4008fbc23f1ce071f9da055ba0b42a03dcf55d83c9a9f18f8c2c5eff938624389286fef60e9026
-// size: (40 floats, 160 bytes) + lights * (8 floats, 32 bytes)
+// size: 40 floats, 160 bytes (4 fixed floats in Lights) + point-lights * (8 floats, 32 bytes)
+// https://webgpufundamentals.org/webgpu/lessons/resources/wgsl-offset-computer.html#x=5d000001005e01000000000000003d888b0237284d3025f2381bcb288ae878c60ccc524b94961b05d1ea86e70104488471fc4190e456f5a619d7f730c8c07da69c196379dfb7e9f59f3c84bc6848ab7f55e643a8fdcbc28c53ae476f6547c2f672f7dbedc37db771e1a95035fa7fe4f3f926448dc81096d5c839d53e3beb8a574e71f43ec8f53de5f7186955ce4821cb2f93292910910cee2412749c33ecff1f7b3ac66f678eaac8692e3e9b392161f34a4d231a5fdb49ecf1aebe03b75d4879321b5b119f421c58de3ae2bfa87bc236452481038d527fe6688115b3a9b141eb0dbcfd1354cf
 struct Uniforms {
   camera:      vec3<f32>, // pad 1 byte
   matrix:      mat4x4<f32>,
@@ -12,7 +12,7 @@ struct Uniforms {
   separation:  f32,
   scale:       vec3<f32>,
   render_type: f32,
-  material:    Material,
+  terrain:     Terrain,
   lights:      Lights,
 };
 
@@ -22,10 +22,10 @@ struct Uniforms {
 @binding(3) @group(0) var                elevation_texture: texture_2d<f32>;
 
 struct VertexShaderOutput {
-   @builtin(position)              position:  vec4<f32>,
-   @location(0)                    normal:    vec3<f32>,
-   @location(1) @interpolate(flat) square:    u32, // For debugging
-   @location(2) @interpolate(flat) elevation: f32,
+   @builtin(position)              position:        vec4<f32>,
+   @location(0)                    normal:          vec3<f32>,
+   @location(1) @interpolate(flat) square:          u32, // For debugging
+   @location(2) @interpolate(flat) world_position: vec3<f32>,
 }
 
 @vertex
@@ -43,8 +43,8 @@ fn vs_main(
   let vertex = (get_local_vertex(face, square_vertex.position) + get_instance_offset(grid_indices)) * uniforms.scale;
   let normal = (uniforms.matrix * vec4<f32>(get_normal(face, square_vertex.normal), 0.0)).xyz;
 
-  let elevation = f32(grid_indices.y) / uniforms.layers[1];
-  return VertexShaderOutput(uniforms.matrix * vec4<f32>(vertex, 1.0), normal, square_data.square, elevation);
+  let world_position = get_world_position(grid_indices);
+  return VertexShaderOutput(uniforms.matrix * vec4<f32>(vertex, 1.0), normal, square_data.square, world_position);
 }
 
 /** Converts an index into a grid position. */
@@ -78,28 +78,37 @@ fn get_instance_offset(grid_indices: vec3<u32>) -> vec3<f32> {
   return vec3<f32>(instance_offset * (1.0 + uniforms.separation));
 }
 
-const RENDER_TYPE_STANDARD    = 0u;
-const RENDER_TYPE_SQUARE_TYPE = 1u;
-const RENDER_TYPE_NORMALS     = 2u;
+fn get_world_position(grid_indices: vec3<u32>) -> vec3<f32> {
+  let xz = get_world_xz(grid_indices.xz, uniforms.terrain, uniforms.layers);
+  return vec3<f32>(xz[0], f32(grid_indices.y), xz[1]);
+}
+
+const RENDER_TYPE_STANDARD       = 0u;
+const RENDER_TYPE_SQUARE_TYPE    = 1u;
+const RENDER_TYPE_NORMALS        = 2u;
+const RENDER_TYPE_POSITION_SCALE = 3u;
 
 @fragment
 fn fs_main(input: VertexShaderOutput) -> @location(0) vec4<f32> {
   switch u32(uniforms.render_type) {
-    case RENDER_TYPE_SQUARE_TYPE: { return fs_square_type(input); }
-    case RENDER_TYPE_NORMALS:     { return fs_normals(input); }
-    default:                      { return fs_render(input); }
+    case RENDER_TYPE_SQUARE_TYPE:    { return fs_square_type(input); }
+    case RENDER_TYPE_NORMALS:        { return fs_normals(input); }
+    case RENDER_TYPE_POSITION_SCALE: { return fs_position_scale(input); }
+    default:                         { return fs_render(input); }
   }
 }
 
 fn fs_render(input: VertexShaderOutput) -> vec4<f32> {
-  let material = Material(get_elevation_color(input.elevation), uniforms.material.diffuse_color, uniforms.material.specular_color, uniforms.material.shininess);
-  let object = PhongObject(input.position.xyz, input.normal, material);
+  let material = get_elevation_material(input.world_position.y / uniforms.layers[1]);
+  let object = PhongObject(input.world_position, input.normal, material);
   return vec4<f32>(calculate_lighting(uniforms.camera, object, uniforms.lights), 1.0);
 }
 
-fn get_elevation_color(elevation: f32) -> vec3<f32> {
-  let color = textureSample(elevation_texture, elevation_sampler, vec2<f32>(elevation, 0.5));
-  return color.rgb;
+fn get_elevation_material(elevation: f32) -> Material {
+  let ambient_color = textureSample(elevation_texture, elevation_sampler, vec2<f32>(0.166666, elevation));
+  let diffuse_color = textureSample(elevation_texture, elevation_sampler, vec2<f32>(0.500000, elevation));
+  let specular_color = textureSample(elevation_texture, elevation_sampler, vec2<f32>(0.833333, elevation));
+  return Material(ambient_color.rgb, diffuse_color.rgb, specular_color.rgb, 0.2);
 }
 
 fn fs_square_type(input: VertexShaderOutput) -> vec4<f32> {
@@ -126,4 +135,14 @@ fn fs_square_type(input: VertexShaderOutput) -> vec4<f32> {
 
 fn fs_normals(input: VertexShaderOutput) -> vec4<f32> {
   return vec4<f32>(abs(input.normal), 1.0);
+}
+
+// This is useful for debugging that the grid is in the correct world position.
+fn fs_position_scale(input: VertexShaderOutput) -> vec4<f32> {
+  // return vec4<f32>(input.world_position, 1.0);
+
+  let x = select(0.1, 1.0, input.world_position.x > 0.5);
+  let y = select(0.1, 1.0, input.world_position.y > 0.5);
+  let z = select(0.1, 1.0, input.world_position.z > 0.5);
+  return vec4<f32>(x, y, z, 1.0);
 }

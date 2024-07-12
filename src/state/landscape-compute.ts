@@ -4,7 +4,7 @@ import { Workgroups } from "../lib/webgpu/workgroups";
 import { getCode } from "../wgsl/blocks";
 import { landscapeComputeBufferAtom } from "./landscape-compute-buffer";
 import { landscapeComputeUniforms } from "./landscape-compute-uniforms";
-import { webGpuContext } from "./webgpu-context";
+import { webGpuContextAtom } from "./webgpu-context";
 import { workgroupsAtom } from "./workgroups";
 
 export interface LandscapeCompute {
@@ -16,7 +16,7 @@ export const landscapeComputeAtom = atom(getLandscapeCompute)
 
 function getLandscapeCompute(get: Getter): LandscapeCompute | null {
   const buffer = get(landscapeComputeBufferAtom)
-  const context = get(webGpuContext)
+  const context = get(webGpuContextAtom)
   const uniforms = get(landscapeComputeUniforms)
   const workgroups = get(workgroupsAtom)
 

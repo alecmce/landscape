@@ -5,7 +5,7 @@ import { BufferWithUpdate, createBufferWithUpdate } from "../lib/webgpu/create-b
 import { WebGpuContext } from "../lib/webgpu/webgpu-context";
 import { layersVec3Atom } from "./layers";
 import { terrainDataAtom } from "./terrain";
-import { webGpuContext } from "./webgpu-context";
+import { webGpuContextAtom } from "./webgpu-context";
 
 
 /** A readonly atom that maintains the compute shader's uniforms. */
@@ -21,7 +21,7 @@ function makeComputeUniforms(): Atom<GPUBuffer | null> {
     return atom(init)
 
     function init(get: Getter): BufferWithUpdate | null {
-      const context = get(webGpuContext)
+      const context = get(webGpuContextAtom)
       return context ? makeBuffer(context) : null
 
       function makeBuffer(context: WebGpuContext): BufferWithUpdate {

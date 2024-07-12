@@ -4,12 +4,15 @@ import './atom-ui.css';
 import { cameraAtom } from "./state/camera";
 import { separationAtom } from "./state/debug";
 import { layerInstances } from "./state/layers";
+import { ambientLightAtom, pointLightsAtom } from "./state/lights";
 import { farAtom, fovAtom, nearAtom, targetAtom } from "./state/perspective";
 import { RENDER_TYPE_OPTIONS, renderTypeAtom } from "./state/render-type";
 import { xzScaleAtom, yScaleAtom } from "./state/scale";
 import { terrainScaleAtom, terrainXYZAtom } from "./state/terrain";
 import { AtomUiGroup } from "./ui/AtomUIGroup";
 import { AtomUiAccordion } from "./ui/AtomUiAccordion";
+import { AtomUiLights } from "./ui/AtomUiLights";
+import { AtomUiPrintState } from "./ui/AtomUiPrintState";
 import { AtomUiResetState } from "./ui/AtomUiResetState";
 import { AtomUiSelect } from "./ui/AtomUiSelect";
 import { AtomUiSlider } from "./ui/AtomUiSlider";
@@ -57,12 +60,16 @@ export function AtomUi(props: Props): ReactNode {
           <AtomUiXYZ atom={terrainXYZAtom} label="Position" min={TERRAIN_XYZ_MIN} max={TERRAIN_XYZ_MAX} step={0.01} />
           <AtomUiXYZ atom={terrainScaleAtom} label="Scale" min={1} max={100} step={0.01} />
         </AtomUiGroup>
+        <AtomUiLights ambientAtom={ambientLightAtom} lightsAtom={pointLightsAtom} />
         <AtomUiGroup name="Debug">
           <AtomUiSlider atom={separationAtom} label="Separation" min={0} max={4} step={0.01} />
           <AtomUiSelect atom={renderTypeAtom} label="Render Type" options={RENDER_TYPE_OPTIONS} />
         </AtomUiGroup>
         </AtomUiAccordion>
-        <AtomUiResetState matchKey={isLandscapeKey} />
+        <HStack>
+          <AtomUiPrintState matchKey={isLandscapeKey} />
+          <AtomUiResetState matchKey={isLandscapeKey} />
+        </HStack>
       </Box>
     </Card>
   )

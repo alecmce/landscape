@@ -1,0 +1,13 @@
+.atom-ui-color-picker {
+  width: 230px;
+}
+
+.atom-ui-color-picker .react-colorful {
+  margin: 5px 0 5px 2px;
+  height: 200px;
+}
+
+.atom-ui-color-picker .react-colorful__pointer {
+  width:  20px;
+  height: 20px;
+}

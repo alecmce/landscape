@@ -7,7 +7,7 @@ import { Vec3, vec3 } from "wgpu-matrix";
 import { deg2rad } from "../lib/math";
 import { targetVec3Atom } from "./perspective";
 
-const camera = atomWithStorage('landscape:camera', { elevationDegrees: 25, radius: 200, azithmulDegrees: 5 })
+const camera = atomWithStorage('landscape:camera', { elevationDegrees: 16, radius: 200, azithmulDegrees: 4.2 })
 
 export const cameraAtom = atom(getCamera, setCamera) as SphericalCoordsAtom
 

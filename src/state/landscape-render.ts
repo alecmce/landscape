@@ -1,16 +1,16 @@
 import { Getter, atom } from 'jotai'
 import { Vec3 } from 'wgpu-matrix'
-import { BYTES_PER_FLOAT } from '../lib/types'
+import { BYTES_PER_FLOAT, TextureWithSampler } from '../lib/types'
 import { WebGpuContext } from '../lib/webgpu/webgpu-context'
 import { getCode } from '../wgsl/blocks'
+import { elevationColorsTextureAtom } from './elevation-colors'
 import { landscapeComputeBufferAtom } from './landscape-compute-buffer'
 import { landscapeDepthTexture } from './landscape-depth-texture'
 import { landscapeRenderUniforms } from './landscape-render-uniforms'
 import { FLOATS_PER_TEMPLATE_VERTEX, TEMPLATE_VERTEX_COUNT, landscapeVertexBuffer } from './landscape-template-vertices'
 import { layersVec3Atom } from './layers'
-import { webGpuContext } from './webgpu-context'
-import { TextureWithSampler, elevationColorsTextureAtom } from './elevation-colors'
 import { pointLightCountAtom } from './lights'
+import { webGpuContextAtom } from './webgpu-context'
 
 
 export interface LandscapeRender {
@@ -22,7 +22,7 @@ export const landscapeRenderAtom = atom(getlandscapeRender)
 
 function getlandscapeRender(get: Getter): LandscapeRender | null {
   const buffer = get(landscapeComputeBufferAtom)
-  const context = get(webGpuContext)
+  const context = get(webGpuContextAtom)
   const uniforms = get(landscapeRenderUniforms)
   const depthTexture = get(landscapeDepthTexture)
   const vertexBuffer = get(landscapeVertexBuffer)
@@ -61,8 +61,8 @@ function makelandscapeRender(props: Props): LandscapeRender {
 
     const passEncoder = encoder.beginRenderPass({
       colorAttachments: [{
-        clearValue: [0.0, 0.0, 0.0, 1.0],
-        loadOp: 'clear',
+        clearValue: [0.0, 0.0, 0.0, 0.0],
+        loadOp: 'load',
         storeOp: 'store',
         view: gpuContext.getCurrentTexture().createView(),
       }],

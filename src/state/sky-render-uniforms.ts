@@ -1,22 +1,16 @@
 import { Atom, Getter, atom } from 'jotai'
 import { atomEffect } from 'jotai-effect'
-import { PAD } from '../lib/types'
+import { getColorVec3 } from '../lib/color'
 import { BufferWithUpdate, createBufferWithUpdate } from '../lib/webgpu/create-buffer'
 import { WebGpuContext } from '../lib/webgpu/webgpu-context'
-import { cameraPositionAtom } from './camera'
-import { separationAtom } from './debug'
-import { layersVec3Atom } from './layers'
-import { UNIFORM_FLOATS_PER_POINT_LIGHT, pointLightCountAtom, lightDataAtom } from './lights'
-import { perspectiveMatrixAtom } from './perspective'
-import { renderTypeValueAtom } from './render-type'
-import { scaleVec3Atom } from './scale'
-import { terrainDataAtom } from './terrain'
+import { ambientLightAtom } from './lights'
+import { inverseMatrixAtom } from './perspective'
 import { webGpuContextAtom } from './webgpu-context'
 
-const UNIFORM_FLOATS_EXCLUDING_LIGHTS = 40 // @see landscape-render.wgsl
+const UNIFORM_FLOATS = 16 // @see sky-render.wgsl
 
 /** A readonly atom that maintains the render shaders' uniforms. */
-export const landscapeRenderUniforms = makeRenderUniforms()
+export const skyRenderUniformsAtom = makeRenderUniforms()
 
 function makeRenderUniforms(): Atom<GPUBuffer | null> {
   const bufferWithUpdate = makeBufferWithUpdateAtom()
@@ -29,12 +23,11 @@ function makeRenderUniforms(): Atom<GPUBuffer | null> {
 
     function init(get: Getter): BufferWithUpdate | null {
       const context = get(webGpuContextAtom)
-      const pointLightCount = get(pointLightCountAtom)
 
       return context ? makeBuffer(context) : null
 
       function makeBuffer(context: WebGpuContext): BufferWithUpdate {
-        const count = UNIFORM_FLOATS_EXCLUDING_LIGHTS + pointLightCount * UNIFORM_FLOATS_PER_POINT_LIGHT
+        const count = UNIFORM_FLOATS
 
         return createBufferWithUpdate({
           context,
@@ -53,25 +46,15 @@ function makeRenderUniforms(): Atom<GPUBuffer | null> {
   }
 
   function applyUpdate(get: Getter): void {
-    const cameraPosition = get(cameraPositionAtom)
     const base = get(bufferWithUpdate)
-    const perspectiveMatrix = get(perspectiveMatrixAtom)
-    const layers = get(layersVec3Atom)
-    const separation = get(separationAtom)
-    const scale = get(scaleVec3Atom)
-    const renderType = get(renderTypeValueAtom)
-    const lights = get(lightDataAtom)
-    const terrain = get(terrainDataAtom)
+    const matrix = get(inverseMatrixAtom)
+    const ambient = get(ambientLightAtom)
 
     if (base) {
       const [, update] = base
       update(new Float32Array([
-        ...cameraPosition, PAD,
-        ...perspectiveMatrix,
-        ...layers, separation,
-        ...scale, renderType,
-        ...terrain,
-        ...lights,
+        ...getColorVec3(ambient.color), ambient.intensity,
+        ...matrix,
       ]))
     }
   }

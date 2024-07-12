@@ -2,7 +2,8 @@ import { Atom, Getter, atom } from 'jotai'
 import { WebGpuContext } from '../lib/webgpu/webgpu-context'
 import { LandscapeCompute, landscapeComputeAtom } from './landscape-compute'
 import { LandscapeRender, landscapeRenderAtom } from './landscape-render'
-import { webGpuContext } from './webgpu-context'
+import { webGpuContextAtom } from './webgpu-context'
+import { SkyRender, skyRenderAtom } from './sky-render'
 
 export interface Landscape {
   (): Promise<void>
@@ -15,30 +16,33 @@ function makelandscape(): Atom<Landscape | null> {
   return atom(getlandscape)
 
   function getlandscape(get: Getter): Landscape | null {
-    const context = get(webGpuContext)
+    const context = get(webGpuContextAtom)
     const compute = get(landscapeComputeAtom)
-    const render = get(landscapeRenderAtom)
+    const renderLandscape = get(landscapeRenderAtom)
+    const renderSky = get(skyRenderAtom)
 
-    return context && compute && render
-      ? makelandscape({ compute, context, render })
+    return context && compute && renderLandscape && renderSky
+      ? makelandscape({ compute, context, renderLandscape, renderSky })
       : null
   }
 
   interface Props {
-    compute:     LandscapeCompute
-    context:     WebGpuContext
-    render:      LandscapeRender
+    compute:         LandscapeCompute
+    context:         WebGpuContext
+    renderLandscape: LandscapeRender
+    renderSky:       SkyRender
   }
 
 
   function makelandscape(props: Props): Landscape {
-    const { compute, context, render } = props
+    const { compute, context, renderLandscape, renderSky } = props
     const { device } = context
 
     return async function iterate(): Promise<void> {
       const encoder = device.createCommandEncoder()
       compute(encoder)
-      render(encoder)
+      renderSky(encoder)
+      renderLandscape(encoder)
       device.queue.submit([encoder.finish()])
 
       // useLoop awaits this to ensure that requestAnimationFrame doesn't go faster than the GPU can handle.

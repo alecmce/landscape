@@ -1,13 +1,13 @@
 import { Getter, atom } from "jotai"
 import { WebGpuContext } from "../lib/webgpu/webgpu-context"
 import { layersDataSize } from "./layers"
-import { webGpuContext } from "./webgpu-context"
+import { webGpuContextAtom } from "./webgpu-context"
 
 
 export const landscapeComputeBufferAtom = atom(getLandscapeComputeBuffer)
 
 function getLandscapeComputeBuffer(get: Getter): GPUBuffer | null {
-  const context = get(webGpuContext)
+  const context = get(webGpuContextAtom)
   const size = get(layersDataSize)
 
   return context ? makeLandscapeComputeBuffer({ context, size }) : null

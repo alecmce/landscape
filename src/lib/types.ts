@@ -19,3 +19,8 @@ export interface SphericalCoords {
 export type SphericalCoordsAtom = ReadWriteAtom<SphericalCoords>
 
 export type XYZ = { x: number, y: number, z: number }
+
+export interface TextureWithSampler {
+  texture: GPUTexture
+  sampler: GPUSampler
+}

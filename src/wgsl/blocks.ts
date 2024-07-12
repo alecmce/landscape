@@ -2,6 +2,7 @@ import { compileCode } from './compile'
 import landscapeCompute from './landscape-compute.wgsl?raw'
 import landscapeRender from './landscape-render.wgsl?raw'
 import landscapeShared from './landscape-shared.wgsl?raw'
+import skyRender from './sky-render.wgsl?raw'
 import terrain from './terrain.wgsl?raw'
 import phongLighting from './phong-lighting.wgsl?raw'
 
@@ -15,6 +16,7 @@ export function getCode(id: string, replacements: Record<string, string> = {}): 
 }
 
 const CODE_BLOCKS = [
+  { id: 'skyRender', code: skyRender, dependencies: [] },
   { id: 'landscapeCompute', code: landscapeCompute, dependencies: ['landscapeShared', 'terrain'] },
   { id: 'landscapeRender', code: landscapeRender, dependencies: ['landscapeShared', 'phongLighting'] },
   { id: 'landscapeShared', code: landscapeShared, dependencies: [] },

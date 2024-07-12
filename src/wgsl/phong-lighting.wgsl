@@ -15,9 +15,10 @@ struct Material {
   shininess:      f32,
 };
 
-// size 8 * POINT_LIGHT_COUNT floats, 32 * POINT_LIGHT_COUNT bytes
+// size 4 + 8 * POINT_LIGHT_COUNT floats, 16 + 32 * POINT_LIGHT_COUNT bytes
 struct Lights {
-  point_lights: array<PointLight, POINT_LIGHT_COUNT>,
+  ambient_light: vec4<f32>,
+  point_lights:  array<PointLight, POINT_LIGHT_COUNT>,
 };
 
 // size 8 floats, 32 bytes
@@ -30,20 +31,25 @@ struct PointLight {
 fn calculate_lighting(camera: vec3<f32>, object: PhongObject, lights: Lights) -> vec3<f32> {
   let material = object.material;
 
-  var result = material.ambient_color;
+  var result = material.ambient_color * lights.ambient_light.xyz * lights.ambient_light.w;
 
   for (var i = 0u; i < POINT_LIGHT_COUNT; i++) {
     let light = lights.point_lights[i];
+
     let lightDir = normalize(light.position - object.position);
     let viewDir = normalize(camera - object.position);
     let halfVector = normalize(lightDir + viewDir);
 
+    let distance = distance(light.position, object.position);
+    let attenuation = 1.0 / (1.0 + 0.1 * distance);
+
     // Diffuse component
-    let diffuse_factor = max(dot(object.normal, lightDir), 0.0);
+    let lambertian_reflectance = dot(object.normal, lightDir);
+    let diffuse_factor = max(lambertian_reflectance * attenuation, 0.0);
     result += material.diffuse_color * light.color * diffuse_factor * light.intensity;
 
     // Specular component
-    let specular_factor = pow(max(dot(object.normal, halfVector), 0.0), material.shininess);
+    let specular_factor = pow(max(dot(object.normal, halfVector) * attenuation, 0.0), material.shininess);
     result += material.specular_color * light.color * specular_factor * light.intensity;
   }
 

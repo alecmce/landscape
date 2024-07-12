@@ -1,6 +1,6 @@
 import { Atom, Getter, atom } from "jotai";
 import { WebGpuContext } from "../lib/webgpu/webgpu-context";
-import { webGpuContext } from "./webgpu-context";
+import { webGpuContextAtom } from "./webgpu-context";
 import { Size, windowSize } from "./window-size";
 
 
@@ -15,7 +15,7 @@ function makeDepthTextureAtom(): Atom<GPUTexture | null> {
   return atom(getBuffers)
 
   function getBuffers(get: Getter): GPUTexture | null {
-    const context = get(webGpuContext)
+    const context = get(webGpuContextAtom)
     const size = get(windowSize)
     return context ? makeDepthTexture({ context, size }) : null
   }

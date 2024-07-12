@@ -10,7 +10,7 @@ export const canvas = atom<HTMLCanvasElement | null>(null)
  * to isolate the async logic in here as far as possible. Not doing this massively complicates the downstream atoms'
  * implementations.
  */
-export const webGpuContext = makeWebGpuContext()
+export const webGpuContextAtom = makeWebGpuContext()
 
 function makeWebGpuContext(): Atom<WebGpuContext | undefined> {
   return unwrap(atom(getWebGpuContext))

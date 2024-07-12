@@ -1,21 +1,35 @@
 import { Getter, atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { getColorVec3 } from "../lib/color";
-import { PAD } from "../lib/types";
+import { PAD, XYZ } from "../lib/types";
 
 export const UNIFORM_FLOATS_PER_POINT_LIGHT = 8
 
-export const pointLightsAtom = atomWithStorage('landscape:pointLights', {
+export interface Lights {
+  [key: string]: PointLight
+}
+
+export interface PointLight {
+  position:  XYZ
+  color:     string
+  intensity: number
+}
+
+export interface AmbientLight {
+  color:     string
+  intensity: number
+}
+
+export const ambientLightAtom = atomWithStorage<AmbientLight>('landscape:ambientLight', {
+  color: '#ffffff', intensity: 0.2
+})
+
+export const pointLightsAtom = atomWithStorage<Lights>('landscape:pointLights', {
   light1: {
-    position:  { x: 0, y: 10, z: 0 },
+    position:  { x: 0, y: 100, z: -81 },
     color:     '#ffffff',
-    intensity: 1,
+    intensity: 0.2,
   },
-  light2: {
-    position: { x: 3, y: 5, z: 3 },
-    color:    '#ff0000',
-    intensity: 0.5,
-  }
 })
 
 export const pointLightCountAtom = atom(getPointLightCount)
@@ -25,14 +39,18 @@ function getPointLightCount(get: Getter): number {
 }
 
 /** Converts the point-light data into the Float32Array format that the shader expects. */
-export const pointLightDataAtom = atom(getPointLightData)
+export const lightDataAtom = atom(getLightData)
 
-function getPointLightData(get: Getter): Float32Array {
-  const data = get(pointLightsAtom)
-  const lights = Object.values(data)
+function getLightData(get: Getter): Float32Array {
+  const ambientLight = get(ambientLightAtom)
+  const pointLights = get(pointLightsAtom)
+  const pointLightValues = Object.values(pointLights)
 
-  return new Float32Array(lights.flatMap(light => ([
-    light.position.x, light.position.y, light.position.z, PAD,
-    ...getColorVec3(light.color), light.intensity,
-  ])))
+  return new Float32Array([
+    ...getColorVec3(ambientLight.color), ambientLight.intensity,
+    ...pointLightValues.flatMap(light => ([
+      light.position.x, light.position.y, light.position.z, PAD,
+      ...getColorVec3(light.color), light.intensity,
+    ]))
+  ])
 }

@@ -1,6 +1,6 @@
 import { Getter, atom } from "jotai"
 import { WebGpuContext } from "../lib/webgpu/webgpu-context"
-import { webGpuContext } from "./webgpu-context"
+import { webGpuContextAtom } from "./webgpu-context"
 
 export const FLOATS_PER_TEMPLATE_VERTEX = 2
 
@@ -16,7 +16,7 @@ export const TEMPLATE_VERTEX_COUNT = SIDE_VERTEX_COUNT + TOP_AND_BOTTOM_VERTEX_C
 export const landscapeVertexBuffer = atom(getBuffer)
 
 function getBuffer(get: Getter): GPUBuffer | null {
-  const context = get(webGpuContext)
+  const context = get(webGpuContextAtom)
   return context ? makeBuffer(context) : null
 }
 
