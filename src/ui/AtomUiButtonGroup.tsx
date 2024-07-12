@@ -13,7 +13,7 @@ interface Option<T> {
   value: T;
 }
 
-export function AtomButtonGroup<T>(props: Props<T>): ReactNode {
+export function AtomUiButtonGroup<T>(props: Props<T>): ReactNode {
   const { atom, label, options } = props;
 
   const [currentValue, setValue] = useAtom(atom)

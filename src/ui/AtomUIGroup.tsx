@@ -1,6 +1,5 @@
 import { AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Grid, Text } from "@chakra-ui/react";
 import { ReactNode } from "react";
-import './atom-ui.css';
 
 interface Props {
   name:     string

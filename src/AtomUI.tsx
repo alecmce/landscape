@@ -1,10 +1,6 @@
-import { Accordion, Box, Card } from "@chakra-ui/react";
-import { Getter, Setter, atom, useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
+import { Box, Card, HStack, Icon, Text, createIcon } from "@chakra-ui/react";
 import { ReactNode } from "react";
-import { AtomUiGroup } from "./AtomUIGroup";
 import './atom-ui.css';
-import { isArray } from "./lib/object";
 import { cameraAtom } from "./state/camera";
 import { separationAtom } from "./state/debug";
 import { layerInstances } from "./state/layers";
@@ -12,6 +8,9 @@ import { farAtom, fovAtom, nearAtom, targetAtom } from "./state/perspective";
 import { RENDER_TYPE_OPTIONS, renderTypeAtom } from "./state/render-type";
 import { xzScaleAtom, yScaleAtom } from "./state/scale";
 import { terrainScaleAtom, terrainXYZAtom } from "./state/terrain";
+import { AtomUiGroup } from "./ui/AtomUIGroup";
+import { AtomUiAccordion } from "./ui/AtomUiAccordion";
+import { AtomUiResetState } from "./ui/AtomUiResetState";
 import { AtomUiSelect } from "./ui/AtomUiSelect";
 import { AtomUiSlider } from "./ui/AtomUiSlider";
 import { AtomUiSphericalCoords } from "./ui/AtomUiSphericalCoords";
@@ -21,16 +20,29 @@ const LAYER_MAX = { x: 128, y: 39, z: 128 }
 const TERRAIN_XYZ_MIN = { x: -1000, y: -50, z: -1000 }
 const TERRAIN_XYZ_MAX = { x: 1000, y: 10, z: 1000 }
 
-export function AtomUi(): ReactNode {
+interface Props {
+  label: string
+}
 
-  const [groupArray, setGroupArray] = useAtom(groupArrayAtom)
+const DragIconSvg = createIcon({
+  displayName: 'DragIcon',
+  viewBox:     '0 -960 960 960',
+  path:         <path fill="currentColor" d="M360-160q-33 0-56.5-23.5T280-240q0-33 23.5-56.5T360-320q33 0 56.5 23.5T440-240q0 33-23.5 56.5T360-160Zm240 0q-33 0-56.5-23.5T520-240q0-33 23.5-56.5T600-320q33 0 56.5 23.5T680-240q0 33-23.5 56.5T600-160ZM360-400q-33 0-56.5-23.5T280-480q0-33 23.5-56.5T360-560q33 0 56.5 23.5T440-480q0 33-23.5 56.5T360-400Zm240 0q-33 0-56.5-23.5T520-480q0-33 23.5-56.5T600-560q33 0 56.5 23.5T680-480q0 33-23.5 56.5T600-400ZM360-640q-33 0-56.5-23.5T280-720q0-33 23.5-56.5T360-800q33 0 56.5 23.5T440-720q0 33-23.5 56.5T360-640Zm240 0q-33 0-56.5-23.5T520-720q0-33 23.5-56.5T600-800q33 0 56.5 23.5T680-720q0 33-23.5 56.5T600-640Z" />
+})
+
+export function AtomUi(props: Props): ReactNode {
+  const { label } = props
 
   return (
     <Card className="atom-ui">
       <Box p={2}>
-        <Accordion allowMultiple index={groupArray} onChange={onGroupChange}>
+        <HStack>
+          <Icon as={DragIconSvg} />
+          <Text fontSize="sm">{ label }</Text>
+        </HStack>
+        <AtomUiAccordion>
         <AtomUiGroup name="Camera">
-          <AtomUiSphericalCoords atom={cameraAtom} label="Camera" />
+          <AtomUiSphericalCoords atom={cameraAtom} label="" />
           <AtomUiSlider atom={fovAtom} label="Field of View" min={1} max={179} step={1} />
           <AtomUiSlider atom={nearAtom} label="Near" min={0.01} max={1000} step={1} />
           <AtomUiSlider atom={farAtom} label="Far" min={0.01} max={5000} step={1} />
@@ -49,28 +61,14 @@ export function AtomUi(): ReactNode {
           <AtomUiSlider atom={separationAtom} label="Separation" min={0} max={4} step={0.01} />
           <AtomUiSelect atom={renderTypeAtom} label="Render Type" options={RENDER_TYPE_OPTIONS} />
         </AtomUiGroup>
-        </Accordion>
+        </AtomUiAccordion>
+        <AtomUiResetState matchKey={isLandscapeKey} />
       </Box>
     </Card>
   )
 
-  function onGroupChange(expanded: number | number[]): void {
-    setGroupArray(isArray(expanded) ? expanded : [expanded])
-  }
 }
 
-/** Stores the open groups in local storage. */
-const groupDataAtom = atomWithStorage<{ [key: string]: true }>('landscape-group-data', { 1: true })
-
-/** Exposes the stored group data atom to an array getter/setter. */
-const groupArrayAtom = atom(getGroupArray, setGroupArray)
-
-function getGroupArray(get: Getter) {
-  const data = get(groupDataAtom)
-  return Object.keys(data).map(Number)
-}
-
-function setGroupArray(_: Getter, set: Setter, value: number[]) {
-  const data = value.reduce((acc, id) => ({ ...acc, [id]: true }), {})
-  set(groupDataAtom, data)
+function isLandscapeKey(key: string): boolean {
+  return key.startsWith('landscape:')
 }

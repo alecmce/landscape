@@ -7,7 +7,7 @@ import { AtomUiSlider } from './AtomUiSlider';
 interface Props {
   atom:       SphericalCoordsAtom;
   disabled?:  boolean;
-  label:      string
+  label?:     string
   debug?:     true
 }
 
@@ -15,12 +15,13 @@ export function AtomUiSphericalCoords(props: Props): ReactNode {
   const { atom, label } = props;
 
   const { azithmulDegrees, elevationDegrees, radius } = useMemo(() => makeSubAtoms(atom), [atom])
+  const stem = label ? `${label}.` : ``
 
   return (
     <>
-      <AtomUiSlider atom={elevationDegrees} label={`${label}.elevation`} min={-90} max={90} step={1} />
-      <AtomUiSlider atom={azithmulDegrees} label={`${label}.azithmul`} min={-180} max={180} step={1} />
-      <AtomUiSlider atom={radius} label={`${label}.radius`} min={1} max={250} step={1} />
+      <AtomUiSlider atom={elevationDegrees} label={`${stem}Elevation`} min={-90} max={90} step={1} />
+      <AtomUiSlider atom={azithmulDegrees} label={`${stem}Azithmul`} min={-180} max={180} step={1} />
+      <AtomUiSlider atom={radius} label={`${stem}Radius`} min={1} max={250} step={1} />
     </>
   )
 }

@@ -24,7 +24,7 @@ export function App(): ReactNode {
   return (
     <Suspense fallback={<Loading />}>
       <canvas className="canvas" ref={setCanvas} width={width} height={height} />
-      <AtomUi />
+      <AtomUi label="Landscape" />
       { landscape ? <Info /> : <Fallback /> }
     </Suspense>
   )

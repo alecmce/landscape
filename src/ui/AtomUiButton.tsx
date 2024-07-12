@@ -8,7 +8,7 @@ interface Props {
   children: ReactNode | ReactNode[]
 }
 
-export function AtomButton(props: Props): ReactNode {
+export function AtomUiButton(props: Props): ReactNode {
   const { atom, children } = props;
 
   const [, trigger] = useAtom(atom)
