@@ -5,7 +5,9 @@ import { constrain } from "../lib/constrain";
 import { deg2rad } from "../lib/math";
 import { AtomUpdate, XYZ, resolveUpdate } from "../lib/types";
 
-export interface FirstPersonInfo extends XYZ, FirstPersonRotation {}
+export interface FirstPersonInfo extends XYZ, FirstPersonRotation {
+  speed: number
+}
 
 export interface FirstPersonRotation {
   pitch: number,
@@ -15,7 +17,7 @@ export interface FirstPersonRotation {
 const UP = vec3.fromValues(0, 1, 0);
 
 // Input Atoms for First-Person Camera
-const sourceAtom = atomWithStorage('landscape:first-person', { x: 0, y: 60, z: 0, pitch: 0, yaw: 0 });
+const sourceAtom = atomWithStorage('landscape:first-person', { x: 0, y: 60, z: 0, pitch: -1, yaw: 0, speed: 1, });
 
 // Output Atoms (same as orbit camera for consistency)
 export const firstPersonCameraAtom = atom(getFpCameraInfo, setFpCameraInfo)
@@ -32,10 +34,13 @@ function getFpCameraInfo(get: Getter): FirstPersonInfo {
 
 const PITCH_CONSTRAINTS = { min: -89, max: 89 };
 const YAW_CONSTRAINTS = { min: -180, max: 180, wrap: true };
+const EPSILON = 0.001 // Hack to avoid weird sky behaviour at 0 yaw.
 
 function setFpCameraInfo(get: Getter, set: Setter, update: AtomUpdate<FirstPersonInfo>): void {
-  const { x, y, z, pitch, yaw } = resolveUpdate(sourceAtom, get, update)
-  set(sourceAtom, { x, y, z, pitch: constrain(pitch, PITCH_CONSTRAINTS), yaw: constrain(yaw, YAW_CONSTRAINTS) });
+  const { x, y, z, speed, pitch, yaw } = resolveUpdate(sourceAtom, get, update)
+  const yawValue = constrain(yaw, YAW_CONSTRAINTS)
+  const pitchValue = constrain(pitch, PITCH_CONSTRAINTS)
+  set(sourceAtom, { x, y, z, speed, pitch: pitchValue === 0 ? EPSILON : pitchValue, yaw: yawValue });
 }
 
 function getFpCameraPosition(get: Getter): Vec3 {

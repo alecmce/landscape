@@ -75,7 +75,9 @@ export function useFirstPersonControls(props: Props): void {
     function onKeyDown(event: KeyboardEvent): void {
       if (HANDLED_KEYS.has(event.key)) {
         keys.add(event.key)
-        requestId = requestAnimationFrame(iterate)
+        if (requestId === null) {
+          requestId = requestAnimationFrame(iterate)
+        }
       }
     }
 
@@ -83,6 +85,7 @@ export function useFirstPersonControls(props: Props): void {
       keys.delete(event.key)
       if (keys.size === 0) {
         cancelAnimationFrame(requestId!)
+        requestId = null
       }
     }
 
@@ -105,10 +108,11 @@ export function useFirstPersonControls(props: Props): void {
     }
 
     function walk(value: FirstPersonInfo, direction: number): FirstPersonInfo {
-      const angle = deg2rad(-value.yaw)
-      const dx = Math.sin(angle) * 0.1 * direction
-      const dz = -Math.cos(angle) * 0.1 * direction
-      return { ...value, x: value.x + dx, z: value.z + dz }
+      const { yaw, x, z, speed } = value
+      const angle = deg2rad(-yaw)
+      const dx = Math.sin(angle) * direction * speed
+      const dz = -Math.cos(angle) * direction * speed
+      return { ...value, x: x + dx, z: z + dz }
     }
   }, [canvas, sensitivity])
 }

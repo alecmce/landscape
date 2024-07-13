@@ -95,7 +95,7 @@ fn get_marching_square_data(grid_indices: vec3<u32>, instance_index: u32) -> Mar
     case  7u: { return MarchingSquareData(type_4(tl, tr, br, bl), square); }
     case  8u: { return MarchingSquareData(rotate(ROT_270d, type_1(bl, tl, tr, br)), square); }
     case  9u: { return MarchingSquareData(rotate(ROT_270d, type_2(bl, tl, tr, br)), square); }
-    case 10u: { return MarchingSquareData(rotate(ROT_090d, type_3(bl, tl, tr, br)), square); }
+    case 10u: { return MarchingSquareData(rotate(ROT_270d, type_3(bl, tl, tr, br)), square); }
     case 11u: { return MarchingSquareData(rotate(ROT_270d, type_4(bl, tl, tr, br)), square); }
     case 12u: { return MarchingSquareData(rotate(ROT_180d, type_2(br, bl, tl, tr)), square); }
     case 13u: { return MarchingSquareData(rotate(ROT_180d, type_4(br, bl, tl, tr)), square); }
