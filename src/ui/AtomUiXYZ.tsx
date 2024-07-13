@@ -1,12 +1,12 @@
 import { Getter, Setter, WritableAtom, atom } from 'jotai';
 import { ReactNode, useMemo } from 'react';
 import { isNumber } from '../lib/object';
-import { XYZ } from '../lib/types';
+import { ReadWriteAtom, XYZ } from '../lib/types';
 import { AtomUiSlider } from './AtomUiSlider';
 
 
 interface Props {
-  atom:       WritableAtom<XYZ, [value: XYZ], void>;
+  atom:       ReadWriteAtom<XYZ>,
   disabled?:  boolean;
   label:      string
   max?:       number | XYZ;

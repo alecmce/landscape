@@ -3,10 +3,10 @@ import { atomEffect } from 'jotai-effect'
 import { PAD } from '../lib/types'
 import { BufferWithUpdate, createBufferWithUpdate } from '../lib/webgpu/create-buffer'
 import { WebGpuContext } from '../lib/webgpu/webgpu-context'
-import { cameraPositionAtom } from './camera'
 import { separationAtom } from './debug'
+import { firstPersonCameraPositionAtom } from './first-person-camera'
 import { layersVec3Atom } from './layers'
-import { UNIFORM_FLOATS_PER_POINT_LIGHT, pointLightCountAtom, lightDataAtom } from './lights'
+import { UNIFORM_FLOATS_PER_POINT_LIGHT, lightDataAtom, pointLightCountAtom } from './lights'
 import { perspectiveMatrixAtom } from './perspective'
 import { renderTypeValueAtom } from './render-type'
 import { scaleVec3Atom } from './scale'
@@ -53,7 +53,7 @@ function makeRenderUniforms(): Atom<GPUBuffer | null> {
   }
 
   function applyUpdate(get: Getter): void {
-    const cameraPosition = get(cameraPositionAtom)
+    const cameraPosition = get(firstPersonCameraPositionAtom)
     const base = get(bufferWithUpdate)
     const perspectiveMatrix = get(perspectiveMatrixAtom)
     const layers = get(layersVec3Atom)

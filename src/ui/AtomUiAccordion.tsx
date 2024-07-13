@@ -32,7 +32,7 @@ export function AtomUiAccordion(props: Props): ReactNode {
   const [groupArray, setGroupArray] = useAtom(groupArrayAtom)
 
   return (
-    <Accordion allowMultiple={allowMultiple} index={groupArray} onChange={onGroupChange}>
+    <Accordion allowMultiple={allowMultiple} allowToggle index={groupArray} onChange={onGroupChange}>
       { children }
     </Accordion>
   )

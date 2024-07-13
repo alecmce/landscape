@@ -21,7 +21,7 @@ export interface AmbientLight {
 }
 
 export const ambientLightAtom = atomWithStorage<AmbientLight>('landscape:ambientLight', {
-  color: '#ffffff', intensity: 0.2
+  color: '#ffffff', intensity: 1
 })
 
 export const pointLightsAtom = atomWithStorage<Lights>('landscape:pointLights', {

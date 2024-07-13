@@ -1,7 +1,8 @@
 import { Getter, atom } from 'jotai'
+import { TextureWithSampler } from '../lib/types'
 import { WebGpuContext } from '../lib/webgpu/webgpu-context'
 import { getCode } from '../wgsl/blocks'
-import { TextureWithSampler, skyColorsTextureAtom } from './sky-colors'
+import { skyColorsTextureAtom } from './sky-colors'
 import { skyRenderUniformsAtom } from './sky-render-uniforms'
 import { webGpuContextAtom } from './webgpu-context'
 

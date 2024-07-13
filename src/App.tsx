@@ -4,9 +4,9 @@ import './App.css';
 
 import { useAtom, useAtomValue } from 'jotai';
 import { AtomUi } from './AtomUI';
+import { useFirstPersonControls } from "./hooks/use-first-person-controls";
 import { useLoop } from './hooks/use-loop';
-import { useOrbitControls } from "./hooks/use-orbit-controls";
-import { cameraAtom } from "./state/camera";
+import { firstPersonCameraAtom } from "./state/first-person-camera";
 import { landscape as landscapeAtom } from './state/landscape';
 import { canvas as canvasAtom } from './state/webgpu-context';
 import { windowSize } from './state/window-size';
@@ -17,7 +17,7 @@ export function App(): ReactNode {
 
   const landscape = useAtomValue(landscapeAtom)
 
-  useOrbitControls({ canvas, cameraAtom, sensitivity: 3 })
+  useFirstPersonControls({ canvas, sourceAtom: firstPersonCameraAtom, sensitivity: 3 })
 
   useLoop(landscape)
 

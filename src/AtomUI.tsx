@@ -1,27 +1,23 @@
 import { Box, Card, HStack, Icon, Text, createIcon } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import './atom-ui.css';
-import { cameraAtom } from "./state/camera";
 import { separationAtom } from "./state/debug";
 import { layerInstances } from "./state/layers";
 import { ambientLightAtom, pointLightsAtom } from "./state/lights";
-import { farAtom, fovAtom, nearAtom, targetAtom } from "./state/perspective";
 import { RENDER_TYPE_OPTIONS, renderTypeAtom } from "./state/render-type";
 import { xzScaleAtom, yScaleAtom } from "./state/scale";
-import { terrainScaleAtom, terrainXYZAtom } from "./state/terrain";
+import { terrainOffsetYAtom, terrainXZScaleAtom, terrainYScaleAtom } from "./state/terrain";
 import { AtomUiGroup } from "./ui/AtomUIGroup";
 import { AtomUiAccordion } from "./ui/AtomUiAccordion";
+import { AtomUiFirstPersonCamera } from "./ui/AtomUiFirstPersonCamera";
 import { AtomUiLights } from "./ui/AtomUiLights";
 import { AtomUiPrintState } from "./ui/AtomUiPrintState";
 import { AtomUiResetState } from "./ui/AtomUiResetState";
 import { AtomUiSelect } from "./ui/AtomUiSelect";
 import { AtomUiSlider } from "./ui/AtomUiSlider";
-import { AtomUiSphericalCoords } from "./ui/AtomUiSphericalCoords";
 import { AtomUiXYZ } from "./ui/AtomUiXYZ";
 
 const LAYER_MAX = { x: 128, y: 39, z: 128 }
-const TERRAIN_XYZ_MIN = { x: -1000, y: -50, z: -1000 }
-const TERRAIN_XYZ_MAX = { x: 1000, y: 10, z: 1000 }
 
 interface Props {
   label: string
@@ -44,21 +40,14 @@ export function AtomUi(props: Props): ReactNode {
           <Text fontSize="sm">{ label }</Text>
         </HStack>
         <AtomUiAccordion>
-        <AtomUiGroup name="Camera">
-          <AtomUiSphericalCoords atom={cameraAtom} label="" />
-          <AtomUiSlider atom={fovAtom} label="Field of View" min={1} max={179} step={1} />
-          <AtomUiSlider atom={nearAtom} label="Near" min={0.01} max={1000} step={1} />
-          <AtomUiSlider atom={farAtom} label="Far" min={0.01} max={5000} step={1} />
-          <AtomUiXYZ atom={targetAtom} label="Target" min={-100} max={100} step={1} />
-        </AtomUiGroup>
+        <AtomUiFirstPersonCamera />
         <AtomUiGroup name="Structure">
           <AtomUiXYZ atom={layerInstances} label="Layers" min={1} max={LAYER_MAX} step={1} />
-          <AtomUiSlider atom={xzScaleAtom} label="XZ Scale" min={1} max={10} step={0.01} />
-          <AtomUiSlider atom={yScaleAtom} label="Y Scale" min={1} max={100} step={0.01} />
-        </AtomUiGroup>
-        <AtomUiGroup name="Terrain">
-          <AtomUiXYZ atom={terrainXYZAtom} label="Position" min={TERRAIN_XYZ_MIN} max={TERRAIN_XYZ_MAX} step={0.01} />
-          <AtomUiXYZ atom={terrainScaleAtom} label="Scale" min={1} max={100} step={0.01} />
+          <AtomUiSlider atom={xzScaleAtom} label="Layer XZ Scale" min={1} max={10} step={0.01} />
+          <AtomUiSlider atom={yScaleAtom} label="Layer Y Scale" min={1} max={100} step={0.01} />
+          <AtomUiSlider atom={terrainOffsetYAtom} label="Terrain Offset Y" min={-50} max={10} step={0.01} />
+          <AtomUiSlider atom={terrainXZScaleAtom} label="Terrain XZ Scale" min={1} max={100} step={0.01} />
+          <AtomUiSlider atom={terrainYScaleAtom} label="Terrain Y Scale" min={1} max={100} step={0.01} />
         </AtomUiGroup>
         <AtomUiLights ambientAtom={ambientLightAtom} lightsAtom={pointLightsAtom} />
         <AtomUiGroup name="Debug">
