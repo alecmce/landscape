@@ -42,7 +42,6 @@ const ROT_270d = mat2x2<f32>( 0.0, -1.0,  1.0,  0.0);
 const ROT_180d = mat2x2<f32>(-1.0,  0.0,  0.0, -1.0);
 const ROT_090d = mat2x2<f32>( 0.0,  1.0, -1.0,  0.0);
 
-
 const TL = vec2<f32>(-0.5, -0.5);
 const TR = vec2<f32>( 0.5, -0.5);
 const BR = vec2<f32>( 0.5,  0.5);

@@ -45,7 +45,7 @@ function setFpCameraInfo(get: Getter, set: Setter, update: AtomUpdate<FirstPerso
 
 function getFpCameraPosition(get: Getter): Vec3 {
   const position = get(sourceAtom);
-  return vec3.fromValues(position.x, position.y, position.z)
+  return vec3.fromValues(0, position.y, 0)
 }
 
 function getFpCameraViewMatrix(get: Getter): Mat4 {

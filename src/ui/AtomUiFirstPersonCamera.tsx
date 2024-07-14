@@ -11,7 +11,7 @@ import { AtomUiXYZ } from "./AtomUiXYZ";
 
 
 const POSITION_MIN = { x: -1000, y: 0, z: -1000 }
-const POSITION_MAX = { x: 1000, y: 100, z: 1000 }
+const POSITION_MAX = { x: 1000, y: 1000, z: 1000 }
 
 export function AtomUiFirstPersonCamera(): ReactNode {
   const xyzAtom = useMemo(() => getPositionAtom(firstPersonCameraAtom), [firstPersonCameraAtom])
@@ -19,7 +19,7 @@ export function AtomUiFirstPersonCamera(): ReactNode {
 
   return (
     <AtomUiGroup name="First Person Camera">
-      <AtomUiXYZ atom={xyzAtom} label="Target" min={POSITION_MIN} max={POSITION_MAX} step={0.01} />
+      <AtomUiXYZ atom={xyzAtom} label="Position" min={POSITION_MIN} max={POSITION_MAX} step={0.01} />
       <AtomUiFirstPersonRotation atom={firstPersonCameraAtom} />
       <AtomUiSlider atom={speedAtom} label="Speed" min={0} max={3} step={0.01} />
       <AtomUiSlider atom={fovAtom} label="Field of View" min={1} max={179} step={1} />

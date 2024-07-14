@@ -8,7 +8,7 @@ import { aspectRatio } from "./window-size";
 
 export const fovAtom = atomWithStorage('landscape:fov', 60);
 export const nearAtom = atomWithStorage('landscape:near', 1)
-export const farAtom = atomWithStorage('landscape:far', 1000)
+export const farAtom = atomWithStorage('landscape:far', 2500)
 export const perspectiveMatrixAtom = makePerspectiveAtom(firstPersonCameraViewMatrixAtom)
 export const inverseMatrixAtom = atom(getInverseMatrix)
 

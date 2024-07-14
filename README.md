@@ -1,13 +1,21 @@
 # Landscape
 
-My third WebGPU exploration:
+My third WebGPU exploration.
 
-1. A Marching Squares implementation
-2. "Borrowing" Inigo Quilez's landscape generation logic to generate landscape from noise
-3. Deeper Jotai/ChakraUi integration
-4. Phong shading
+I leaned into the Jotai for the curation of both state and derived state, which is particularly useful for the complex
+state required to maintain a WebGPU configuration. The more I use Jotai, the more I enjoy its design.
+
+Chakra UI is quite opinionated, and pulls focus from the first-person controller in some scenarios, but is quite
+lightweight and clean compared with MUI, so I might persevere with it.
+
+I started wanting to build a landscape with a "Game Of Thrones opening sequence" aesthetic. I ended up using [Inigo Quilez's terrain demo](https://www.shadertoy.com/view/4ttSWf)) as a starting point and source of the random landscape, but impementing Marching
+Squares to build the geometry, as I had [recently played with raymarching](https://alecmce.com/webgpu/).
+
+The phong shading, sky rendering and first-person camera were additions to make the demo a bit more interesting to play
+with.
 
 Live demo here: https://alecmce.com/landscape.
+Source code here: https://github.com/alecmce/landscape
 
 ## References
 

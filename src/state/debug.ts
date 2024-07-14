@@ -2,7 +2,7 @@ import { Getter, Setter, atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { clamp } from "../lib/math";
 
-const separation = atomWithStorage('separation', 0.1)
+const separation = atomWithStorage('landscape:separation', 0)
 
 export const separationAtom = atom(getSeparation, setSeparation)
 

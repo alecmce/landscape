@@ -1,5 +1,5 @@
 .atom-ui-color-picker {
-  width: 230px;
+  width: inherit !important;
 }
 
 .atom-ui-color-picker .react-colorful {

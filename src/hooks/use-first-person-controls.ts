@@ -10,9 +10,12 @@ interface Props {
   sourceAtom:  ReadWriteAtom<FirstPersonInfo>
 }
 
-const ARROW_UP = 'ArrowUp'
-const ARROW_DOWN = 'ArrowDown'
-const HANDLED_KEYS = new Set<string>([ARROW_UP, ARROW_DOWN])
+enum KEY {
+  ARROW_UP   = 'ArrowUp',
+  ARROW_DOWN = 'ArrowDown',
+}
+
+const HANDLED_KEYS = new Set<string>([KEY.ARROW_UP, KEY.ARROW_DOWN])
 
 export function useFirstPersonControls(props: Props): void {
   const { canvas, sensitivity, sourceAtom } = props
@@ -90,9 +93,9 @@ export function useFirstPersonControls(props: Props): void {
     }
 
     function iterate(): void {
-      if (keys.has(ARROW_UP)) {
+      if (keys.has(KEY.ARROW_UP)) {
         setInfo(walkForwards)
-      } else if (keys.has(ARROW_DOWN)) {
+      } else if (keys.has(KEY.ARROW_DOWN)) {
         setInfo(walkBackwards)
       }
 

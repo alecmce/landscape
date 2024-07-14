@@ -3,7 +3,7 @@ import { ReactNode, Suspense, useState } from 'react';
 import './App.css';
 
 import { useAtom, useAtomValue } from 'jotai';
-import { AtomUi } from './AtomUI';
+import { AtomUi } from './ui/AtomUi';
 import { useFirstPersonControls } from "./hooks/use-first-person-controls";
 import { useLoop } from './hooks/use-loop';
 import { firstPersonCameraAtom } from "./state/first-person-camera";
@@ -44,7 +44,9 @@ function Info(): ReactNode {
       </Box>
       <Box p={2}>
         <Text fontSize="sm">
-          Landscape Demo - in progress
+          Landscape Demo - Marching Squares over a Fractional Brownian Motion nosie landscape, calculated on the compute shader.
+          A sky render and a naive Phong shading render. Simple fixed-elevation first-person camera controls. State management
+          using Jotai.
         </Text>
       </Box>
     </Card>
